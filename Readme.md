@@ -14,6 +14,7 @@ The sstCommerce system is using a microservice oriented architecture with databa
 
 Components overview
 -------------------
+![Components!](ComponentDiagram.PNG "Components")
 Product microservice:
 * ASP.NET Core Web API application
 * REST API principles, CRUD operations
@@ -45,7 +46,7 @@ Launch microservices:
 * Product API: http://localhost:8000/swagger/index.html
 * Tracking API: http://localhost:8001/swagger/index.html
 
-Test endpoints:
+Test end points:
 ---------------
 Check ProductDB data
 
