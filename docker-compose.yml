@@ -1,0 +1,23 @@
+version: '1.0'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    
+  productdb:
+    image: "mcr.microsoft.com/mssql/server"
+  
+  trackingdb:
+    image: mongo
+
+  product.api:
+    image: ${DOCKER_REGISTRY-}productapi
+    build:
+      context: .
+      dockerfile: ProductAPI/Dockerfile
+  
+  tracking.api:
+    image: ${DOCKER_REGISTRY-}trackingapi
+    build:
+      context: .
+      dockerfile: TrackingAPI/Dockerfile

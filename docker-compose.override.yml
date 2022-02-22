@@ -1,0 +1,66 @@
+version: '1.0'
+
+services:
+  rabbitmq:
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+      
+  productdb:
+    container_name: productdb
+    restart: always
+    environment:
+        SA_PASSWORD: "Saigon@123"
+        ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+  
+  trackingdb:
+    container_name: trackingdb
+    restart: always
+    volumes:
+      - ${WEBAPP_STORAGE_HOME}/site:/data/db
+    ports:
+      - "27017:27017"
+
+  migration:
+    build:
+      context: .
+      dockerfile: Migrations/Dockerfile
+    environment:
+        SA_USER: "sa"
+        SA_PASSWORD: "Saigon@123"
+    depends_on:
+      - productdb
+    entrypoint: ["./wait-for-it.sh", "productdb:1433", "-t", "120","--","flyway"]
+    command: "-user=sa -password=Saigon@123 -url='jdbc:sqlserver://productdb:1433;databaseName=master' -locations='filesystem:.' -mixed=true migrate"
+  product.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "ProductDatabaseSettings:ConnectionString=Server=productdb;Database=ProductDB;user id=sa;password=Saigon@123"
+      - "EventBus:HostName=rabbitmq://rabbitmq"
+    depends_on:
+      - productdb
+      - migration
+      - rabbitmq
+    volumes:
+      - ${HOME}/.microsoft/usersecrets/:/root/.microsoft/usersecrets
+      - ${HOME}/.aspnet/https:/root/.aspnet/https/
+    ports:
+      - "8000:80"
+
+  tracking.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "TrackingDatabaseSettings:ConnectionString=mongodb://trackingdb:27017"
+      - "EventBus:HostName=rabbitmq://rabbitmq"
+    depends_on:
+      - trackingdb
+      - rabbitmq
+    volumes:
+      - ${HOME}/.microsoft/usersecrets/:/root/.microsoft/usersecrets
+      - ${HOME}/.aspnet/https:/root/.aspnet/https/
+    ports:
+      - "8001:80"
