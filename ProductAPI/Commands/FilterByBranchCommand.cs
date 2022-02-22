@@ -11,7 +11,7 @@ namespace ProductAPI.Commands
     {
         private readonly IProductRepository _repository;
 
-        public IEnumerable<Product> Result{get; private set;}
+        public IEnumerable<Product> Result { get; private set; }
 
         private readonly ILogger<SearchCommand> _logger;
 
@@ -24,8 +24,10 @@ namespace ProductAPI.Commands
             _repository = repository?? throw new ArgumentNullException(nameof(repository));
             _bus = bus?? throw new ArgumentNullException(nameof(bus));
             _eventBus = eventBus?? throw new ArgumentNullException(nameof(eventBus));
-            _logger = logger;
+            _logger = logger?? throw new ArgumentNullException(nameof(logger));
+            Result = new List<Product>();
         }
+        
         public async Task Execute(MessageEvent messageEvent)
         {
             var filterEvent = messageEvent as ProductFilterEvent;

@@ -15,87 +15,79 @@ namespace ProductAPI.Repositories
             _context = (ProductContext)productContext ?? throw new ArgumentNullException(nameof(productContext));
         }
 
-        public async Task<IEnumerable<Product>> GetProducts()
-        {
-            return await _context
-                            .Products
-                            
-                            .ToListAsync();
-        }
-
         public async Task<IEnumerable<Product>> SortProducts(string column, SortDirection direction)
         {
-            if(direction == SortDirection.Asc)
+            if(_context.Products != null )
             {
+                if(direction == SortDirection.Asc)
+                {
+                    return await _context
+                                .Products
+                                .OrderBy(p => EF.Property<string>(p, column))
+                                .ToListAsync();
+                }
+
                 return await _context
-                            .Products
-                            .OrderBy(p => EF.Property<string>(p, column))
-                            .ToListAsync();
+                                .Products
+                                .OrderByDescending(p => EF.Property<string>(p, column))
+                                .ToListAsync();
             }
-
-            return await _context
-                            .Products
-                            .OrderByDescending(p => EF.Property<string>(p, column))
-                            .ToListAsync();
-        }
-
-        public async Task<Product> GetProduct(int id)
-        {
-            return await _context
-                            .Products
-                            .FindAsync(id)
-                            .AsTask();
-        }
-
-        public async Task<IEnumerable<Product>> GetProductByName(string name)
-        {
-            return await _context
-                          .Products
-                          .Where(p => p.Name.Contains(name))
-                          .ToListAsync();
+            
+            return new List<Product>();            
         }
 
         public async Task<IEnumerable<Product>> FilterProductByColor(string color)
         {
-            return await _context
-                          .Products
-                          .Where(p => p.Color == color)
-                          .ToListAsync();
+            if(_context.Products != null )
+            {
+                return await _context
+                            .Products
+                            .Where(p => p.Color == color)
+                            .ToListAsync();
+            }
+
+            return new List<Product>();   
         }
 
         public async Task<IEnumerable<Product>> FilterProductByBranch(string branch)
         {
-            return await _context
+            if(_context.Products != null )
+            {
+                return await _context
                           .Products
                           .Where(p => p.Branch == branch)
                           .ToListAsync();
-        }
-        public async Task Create(Product product)
-        {
-            await _context.Products.AddAsync(product);
-            _context.SaveChanges();
+            }
+            return new List<Product>();
         }
 
-        public async Task<bool> Update(Product product)
+        public async Task<Product> GetProduct(int id)
         {
-            var updateResult = _context
-                                        .Products
-                                        .Update(product);
-            var state = updateResult.State;
-            await _context.SaveChangesAsync();
-            return state == EntityState.Modified;
+            if(_context.Products != null )
+            {
+                var findResult = await _context
+                            .Products
+                            .FindAsync(id);
+
+                if(findResult != null)
+                {
+                    return findResult;
+                }
+            }
+            return new Product();
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<IEnumerable<Product>> GetProductByName(string name)
         {
-            var product = await this.GetProduct(id);
-            var deleteResult = _context
-                                                .Products
-                                                .Remove(product);
-            var state = deleteResult.State;
-            await _context.SaveChangesAsync();
-            
-            return state == EntityState.Deleted;
+            if(_context.Products != null )
+            {
+                return await _context
+                          .Products
+                          .Where(p => p.Name.Contains(name))
+                          .ToListAsync();
+            }
+
+            return new List<Product>();
         }
     }
 }

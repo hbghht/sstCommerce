@@ -10,12 +10,12 @@ namespace ProductAPI.Entities
         [Key]
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
-        public string Color { get; set; }
+        public string? Color { get; set; }
 
-        public string Branch { get; set; }
+        public string? Branch { get; set; }
 
-        public decimal Price { get; set; }
+        public decimal? Price { get; set; }
     }
 }

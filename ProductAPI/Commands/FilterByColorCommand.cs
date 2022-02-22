@@ -25,7 +25,9 @@ namespace ProductAPI.Commands
             _bus = bus?? throw new ArgumentNullException(nameof(bus));
             _eventBus = eventBus?? throw new ArgumentNullException(nameof(eventBus));
             _logger = logger;
+            Result = new List<Product>();
         }
+        
         public async Task Execute(MessageEvent messageEvent)
         {
             var filterEvent = messageEvent as ProductFilterEvent;

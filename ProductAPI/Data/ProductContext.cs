@@ -7,8 +7,10 @@ namespace ProductAPI.Data
   public class ProductContext : DbContext, IProductContext
   {
     #region DefineLoggerFactory
+    
     public static readonly ILoggerFactory MyLoggerFactory
         = LoggerFactory.Create(builder => builder.AddConsole()) ;
+
     #endregion
 
     ProductDatabaseSettings settings;

@@ -4,6 +4,6 @@ namespace EventBusRabbitMQ.Events
     {
         public Guid RequestId { get; set; }
         
-        public string UserName{ get; set; }
+        public string UserName{ get; set; } = String.Empty;
     }
 }

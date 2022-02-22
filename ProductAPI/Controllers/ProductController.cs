@@ -27,22 +27,14 @@ namespace ProductAPI.Controllers
 
         private readonly IViewCommand _viewCommand;
 
-        public ProductController(IProductRepository repository, ILogger<ProductController> logger, Func<CommandEnum, ProductColumnEnum?, IQueryCommand> getCommand, IViewCommand viewCommand)
+        public ProductController(IProductRepository repository, ILogger<ProductController> logger, Func<CommandEnum, ProductColumnEnum?, IQueryCommand?> getCommand, IViewCommand viewCommand)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _searchCommand = getCommand(CommandEnum.SEARCH, null);
-            _filterByColorCommand = getCommand(CommandEnum.FILTER, ProductColumnEnum.Color);
-            _filterByBranchCommand = getCommand(CommandEnum.FILTER, ProductColumnEnum.Branch);
-            _viewCommand = viewCommand ?? throw new ArgumentNullException(nameof(viewCommand));
-        }
-
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<Product>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
-        {
-            var products = await _repository.GetProducts();
-            return Ok(products);
+            _searchCommand = getCommand(CommandEnum.SEARCH, null) ?? throw new ArgumentNullException(nameof(_searchCommand));
+            _filterByColorCommand = getCommand(CommandEnum.FILTER, ProductColumnEnum.Color)?? throw new ArgumentNullException(nameof(_filterByColorCommand));
+            _filterByBranchCommand = getCommand(CommandEnum.FILTER, ProductColumnEnum.Branch)?? throw new ArgumentNullException(nameof(_filterByBranchCommand));
+            _viewCommand = viewCommand ?? throw new ArgumentNullException(nameof(viewCommand))?? throw new ArgumentNullException(nameof(_viewCommand));
         }
 
         [Route("Sort/{column}/{direction}")]
@@ -124,44 +116,6 @@ namespace ProductAPI.Controllers
             }
 
             return Ok(product);
-        }
-
-        [HttpGet("{id}", Name = "GetProduct")]
-        [ProducesResponseType(typeof(Product), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<Product>> GetProduct(int id)
-        {
-            var product = await _repository.GetProduct(id);
-
-            if (product == null)
-            {
-                _logger.LogError($"Product with id: {id} was not found.");
-                return NotFound();
-            }
-
-            return Ok(product);
-        }
-
-        [HttpPost]
-        [ProducesResponseType(typeof(Product), (int)HttpStatusCode.Created)]
-        public async Task<ActionResult<Product>> CreateProduct([FromBody] Product product)
-        {
-            await _repository.Create(product);
-
-            return CreatedAtRoute("GetProduct", new { id = product.Id }, product);
-        }
-
-        [HttpPut]
-        [ProducesResponseType(typeof(Product), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> UpdateProduct([FromBody] Product value)
-        {
-            return Ok(await _repository.Update(value));
-        }
-
-        [HttpDelete("{id}")]
-        [ProducesResponseType(typeof(void), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> DeleteProductById(int id)
-        {
-            return Ok(await _repository.Delete(id));
         }
     }
 }

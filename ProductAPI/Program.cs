@@ -33,22 +33,23 @@ builder.Services.AddTransient<SearchCommand>();
 builder.Services.AddTransient<FilterByColorCommand>();
 builder.Services.AddTransient<FilterByBranchCommand>();
 builder.Services.AddTransient<IViewCommand, ViewCommand>();
-builder.Services.AddTransient<Func<CommandEnum, ProductColumnEnum?, IQueryCommand>>((serviceProvider =>(key, filterBy) =>  
-{  
-    switch (key)  
+builder.Services.AddTransient<Func<CommandEnum, ProductColumnEnum?, IQueryCommand?>>((serviceProvider =>(key, filterBy) =>  
     {  
-        case CommandEnum.SEARCH:  
-            return serviceProvider.GetService<SearchCommand>();  
-        default:  
-            switch (filterBy)
-            {
-                case ProductColumnEnum.Color:
-                    return serviceProvider.GetService<FilterByColorCommand>();
-                default:
-                    return serviceProvider.GetService<FilterByBranchCommand>();
-            }
-    }  
-})  );
+        switch (key)  
+        {  
+            case CommandEnum.SEARCH:  
+                return serviceProvider.GetService<SearchCommand>();  
+            default:  
+                switch (filterBy)
+                {
+                    case ProductColumnEnum.Color:
+                        return serviceProvider.GetService<FilterByColorCommand>();
+                    default:
+                        return serviceProvider.GetService<FilterByBranchCommand>();
+                }
+        }  
+    })  
+);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

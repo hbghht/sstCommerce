@@ -4,10 +4,10 @@ namespace TrackingAPI.Entities
     {
         public Guid RequestId { get; set; }
         
-        public string UserName{ get; set; }
+        public string UserName{ get; set; } = String.Empty;
 
-        public string Column { get; set; }
+        public string Column { get; set; } = String.Empty;
         
-        public string Value { get; set; }
+        public string Value { get; set; } = String.Empty;
     }
 }

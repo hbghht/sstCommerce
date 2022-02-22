@@ -11,7 +11,7 @@ namespace ProductAPI.Commands
     {
         private readonly IProductRepository _repository;
 
-        public Product Result{get; private set;}
+        public Product Result { get; private set; }
 
         private readonly ILogger<SearchCommand> _logger;
 
@@ -25,6 +25,7 @@ namespace ProductAPI.Commands
             _bus = bus?? throw new ArgumentNullException(nameof(bus));
             _eventBus = eventBus?? throw new ArgumentNullException(nameof(eventBus));
             _logger = logger;
+            Result = new Product();
         }
 
         public async Task Execute(MessageEvent messageEvent)
